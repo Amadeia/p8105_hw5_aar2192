@@ -37,3 +37,26 @@ longitudinal_df =
     unnest 
 ```
 
+- Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary
+
+```{r}
+longitudinal_df =
+    tibble(participant = list.files(path = "./data"),
+           csv_file = str_c(path = "./data/", participant)) %>% 
+    mutate(data = map(csv_file, read_csv)) %>% 
+    unnest %>%
+    separate(participant, into = c("participant_id", "trash"), sep = ".c") %>% 
+  mutate(study_arm = participant_id) %>%
+  mutate(study_arm = str_replace(study_arm, "con", "control")) %>% 
+  mutate(study_arm = str_replace(study_arm, "exp", "experiment")) %>% 
+  separate(study_arm, into = c("study_arm", "trash1"), sep = "_") %>% 
+  select(participant_id, study_arm, everything(), -starts_with("trash"), -csv_file) %>% 
+  janitor::clean_names() %>% 
+  gather(key = week, value = observation, week_1:week_8) %>% 
+  separate(week, into = c("trash", "week"), sep = "_") %>% 
+  select(-trash) 
+```
+
+- Make a spaghetti plot showing observations on each subject over time, and comment on differences between groups.
+
+
