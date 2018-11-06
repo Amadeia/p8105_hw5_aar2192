@@ -69,6 +69,7 @@ longitudinal_df %>%
        y = "Observations") + 
   viridis::scale_color_viridis(
     name = "Study arm", 
-    discrete = TRUE)
+    discrete = TRUE) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
