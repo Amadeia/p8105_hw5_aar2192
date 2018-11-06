@@ -13,19 +13,27 @@ knitr::opts_chunk$set(
   out.width = "90%"
 )
 library(tidyverse)
+library(purrr)
 theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
 
 # Problem 1
 
-### Part A
-
 - Start with a dataframe containing all file names; the list.files function will help
 
 ```{r}
-file_names =
-  tibble(file_name = list.files(path = "./data")) 
+longitudinal_df =
+    tibble(file_name = list.files(path = "./data")) 
 
-file_names
+```
+
+- Iterate over file names and read in data for each subject using purrr::map and saving the result as a new variable in the dataframe
+
+```{r}
+  longitudinal_df =
+    tibble(participant = list.files(path = "./data"),
+           csv_file = str_c(path = "./data/", participant)) %>% 
+    mutate(data = map(csv_file, read_csv)) %>% 
+    unnest 
 ```
 
