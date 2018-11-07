@@ -91,3 +91,25 @@ Given the spaghetti plot above, it appears that subjects in the **"experiment"**
 While there is some overlap/crossing of lines between the "control" and "experiment" subjects with regard to observations, it seems that the highest observation among subjects in the "control" arm is at around 4.5 compared to above 7.5 among subjects in the "experiment" arm. The lowest observation is slightly above -2.5 among subjects in the "control" arm compared to just above -1 among subjects in the "experiment" arm.
 
 # Problem 2
+
+## Part A
+
+- Describe the raw data. 
+
+```{r}
+wp_murders_df = read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
+
+str(wp_murders_df)
+
+table(wp_murders_df$victim_sex)
+```
+There are **52,179 observations** with **12 variables** in this dataset, which are "uid", "reported_date", "victim_last", "victim_first", "victim_race", victim_age", "victim_sex", "city", "state", "lat", "lon", and "disposition".  
+The data include the _location_ of the killing (which is defined by 4 variables "city", "state", "lat", and "lon"), whether an _arrest_ was made (defined by the variable "disposition"), the _reported date_ of the homicide ("reported_date") and information about each victim, such as _name_, _race_, _sex_, _age_, and their _homicide ID_ (captured by the variables "victim_last", "victim_first", "victim_race", victim_sex" "victim_age", and "uid").  
+
+Of the 52,179 homicides, **7,209 were female**, **40,739 were male**, and 4,231 were unknown.  
+
+
+
+- Create a city_state variable (e.g. “Baltimore, MD”) 
+- Summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+
