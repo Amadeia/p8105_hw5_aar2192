@@ -102,14 +102,29 @@ wp_murders_df = read_csv("https://raw.githubusercontent.com/washingtonpost/data-
 str(wp_murders_df)
 
 table(wp_murders_df$victim_sex)
+unique(wp_murders_df$city)
+unique(wp_murders_df$state)
+summary(as.numeric(wp_murders_df$victim_age), na.rm = TRUE)
+sort(table(wp_murders_df$city), decreasing = TRUE)
 ```
 There are **52,179 observations** with **12 variables** in this dataset, which are "uid", "reported_date", "victim_last", "victim_first", "victim_race", victim_age", "victim_sex", "city", "state", "lat", "lon", and "disposition".  
 The data include the _location_ of the killing (which is defined by 4 variables "city", "state", "lat", and "lon"), whether an _arrest_ was made (defined by the variable "disposition"), the _reported date_ of the homicide ("reported_date") and information about each victim, such as _name_, _race_, _sex_, _age_, and their _homicide ID_ (captured by the variables "victim_last", "victim_first", "victim_race", victim_sex" "victim_age", and "uid").  
 
-Of the 52,179 homicides, **7,209 were female**, **40,739 were male**, and 4,231 were unknown.  
+Of the 52,179 homicides, **7,209 were female**, **40,739 were male**, and 4,231 were unknown. The data came from ** 50 large cities** from **28 states**. The homicides span from 2007 to 2017 for most cities. Ages of homicides ranged from 0 (presumed to be less than a year old) to 102, with a median of 28 years of age. There were 2999 homicides without age reported (NA's). The 5 cities with the most homicides were _Chicago_ (5535), _Philadelphia_ (3037), _Houston_ (2942), _Baltimore_ (2827), and _Detroit_ (2519) 
 
-
+## Part B
 
 - Create a city_state variable (e.g. “Baltimore, MD”) 
+
+```{r}
+
+```
+
+## Part C
+
 - Summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+
+```{r}
+
+```
 
