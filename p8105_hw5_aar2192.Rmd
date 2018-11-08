@@ -106,25 +106,94 @@ unique(wp_murders_df$city)
 unique(wp_murders_df$state)
 summary(as.numeric(wp_murders_df$victim_age), na.rm = TRUE)
 sort(table(wp_murders_df$city), decreasing = TRUE)
+sort(table(wp_murders_df$victim_race), decreasing = TRUE)
 ```
-There are **52,179 observations** with **12 variables** in this dataset, which are "uid", "reported_date", "victim_last", "victim_first", "victim_race", victim_age", "victim_sex", "city", "state", "lat", "lon", and "disposition".  
+There are **52179 observations** with **12 variables** in this dataset, which are "uid", "reported_date", "victim_last", "victim_first", "victim_race", victim_age", "victim_sex", "city", "state", "lat", "lon", and "disposition".  
 The data include the _location_ of the killing (which is defined by 4 variables "city", "state", "lat", and "lon"), whether an _arrest_ was made (defined by the variable "disposition"), the _reported date_ of the homicide ("reported_date") and information about each victim, such as _name_, _race_, _sex_, _age_, and their _homicide ID_ (captured by the variables "victim_last", "victim_first", "victim_race", victim_sex" "victim_age", and "uid").  
 
-Of the 52,179 homicides, **7,209 were female**, **40,739 were male**, and 4,231 were unknown. The data came from ** 50 large cities** from **28 states**. The homicides span from 2007 to 2017 for most cities. Ages of homicides ranged from 0 (presumed to be less than a year old) to 102, with a median of 28 years of age. There were 2999 homicides without age reported (NA's). The 5 cities with the most homicides were _Chicago_ (5535), _Philadelphia_ (3037), _Houston_ (2942), _Baltimore_ (2827), and _Detroit_ (2519) 
+Of the 52,179 homicides, **7209** were female, **40739** were male, and 4,231 were unknown. The data came from **50 large cities** from **28 states**. The homicides span from _2007_ to _2017_ for most cities. Ages of homicides ranged from **0** (presumed to be less than a year old) to **102**, with a median of **28 years of age**. There were 2999 homicides without age reported (NA's). The 5 cities with the most homicides were _Chicago_ (5535), _Philadelphia_ (3037), _Houston_ (2942), _Baltimore_ (2827), and _Detroit_ (2519). Most of the homicide victims were of Black race (33361).
 
 ## Part B
 
 - Create a city_state variable (e.g. “Baltimore, MD”) 
 
 ```{r}
+wp_murders_df =
+  wp_murders_df %>% 
+  mutate(state = replace(state, city=="Tulsa", "OK")) %>% 
+  mutate(city_state = paste(city, state, sep = "_")) %>% 
+  select(uid:lon, city, state, city_state, disposition)
+  
 
+summary(unique(wp_murders_df$city_state))
+sort(table(wp_murders_df$city_state), decreasing = TRUE)
 ```
+A new variable, "city_state", has been created using mutate and paste. When originally creating the new variable, it was noticed that there were 51 unique values for "city_state" as opposed to 50 (this was discovered by looking at the commands "unique(wp_murders_df$city_state)" and "sort(table(wp_murders_df$city_state), decreasing = TRUE)". It seems that for one observation, the city Tulsa was accidentally cross referenced to AL instead of OK. This was corrected.
 
 ## Part C
 
 - Summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
 
 ```{r}
+wp_murders_df %>% 
+  group_by(city, disposition) %>% 
+  summarize(n = n()) %>% 
+  spread(key = disposition, value = n) %>% 
+  janitor::clean_names() %>% 
+  mutate(n_unsolved = sum(closed_without_arrest, open_no_arrest, na.rm=TRUE)) %>% 
+  mutate(n_homicide = sum(closed_without_arrest, open_no_arrest, closed_by_arrest, na.rm=TRUE)) %>% 
+  select(-closed_by_arrest, -closed_without_arrest, -open_no_arrest) %>% 
+  arrange(-n_unsolved)
 
 ```
+As seen by the grouped and arranged dataframe above, the cities with the highest number of unsolved homicides are Chicago (4073), Baltimore (1825), Houston (1493), Detroit (1482), and Philadelphia (1360).
+
+## Part D
+
+- For the city of Baltimore, MD, use the prop.test function to estimate the **proportion of homicides** that are unsolved; save the output of prop.test as an R object, apply the broom::tidy to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
+
+```{r}
+## currently not sure what prop.test does!!!
+wp_murders_city =
+  wp_murders_df %>% 
+  group_by(city, disposition) %>% 
+  summarize(n = n()) %>% 
+  spread(key = disposition, value = n) %>% 
+  janitor::clean_names() %>% 
+  mutate(n_unsolved = sum(closed_without_arrest, open_no_arrest, na.rm=TRUE)) %>% 
+  mutate(n_homicide = sum(closed_without_arrest, open_no_arrest, closed_by_arrest, na.rm=TRUE)) %>% 
+  select(-closed_by_arrest, -closed_without_arrest, -open_no_arrest) %>%
+  mutate(n_homicide = as.numeric(n_homicide), n_unsolved = as.numeric(n_unsolved)) %>% 
+  ungroup() 
+
+baltimore = wp_murders_city %>% 
+  filter(city == "Baltimore")
+
+prop_res_balt = prop.test(baltimore$n_unsolved, baltimore$n_homicide)
+
+broom::tidy(prop_res_balt) %>% 
+  select(estimate, conf.low, conf.high)  
+
+```
+
+In this chunk, I created a dataframe from the grouping I did earlier and then created a new dataframe with Baltimore as the only city. I applied prop.test to this newly created dataframe (but I didn't do this using pipes). I saved the output of the prop.test results and applied broom::tidy so as to just create a dataframe containing the estimate and the upper and lower confidence intervals.
+
+## Part E
+
+- Now run prop.test for each of the cities in your dataset, and extract both the proportion of unsolved homicides and the confidence interval for each. Do this within a “tidy” pipeline, making use of purrr::map, purrr::map2, list columns and  unnest as necessary to create a tidy dataframe with estimated proportions and CIs for each city.
+
+```{r}
+
+prop_new = function(x,n){
+  output = prop.test(x,n)
+  broom::tidy(output)
+}
+
+wp_murders_city %>% 
+  mutate(prop = map2(n_unsolved,n_homicide, prop_new) ) %>% 
+  unnest() %>% 
+  select(city, estimate,conf.low, conf.high)
+
+```
+
 
