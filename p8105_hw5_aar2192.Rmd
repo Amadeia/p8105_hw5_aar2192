@@ -217,5 +217,5 @@ wp_murders_city %>%
 
 ### Plot 2 description:  
 
-This graph is organized in ascending order from cities with a low proportion of unsolved homicides to a high proportion. From what we can see, Chicago has the highest proportion while Ricmond has the lowest among the 50 cities.
+This graph is organized in ascending order from cities with a low proportion of unsolved homicides to a high proportion. From what we can see, Chicago has the highest proportion while Ricmond has the lowest among the 50 cities. We can also see that Tampa and Savanah have wider confidence intervals for the proportion of unsolved homicides, while Chicago has the smallest confidence interval.
 
