@@ -173,7 +173,6 @@ prop_res_balt = prop.test(baltimore$n_unsolved, baltimore$n_homicide)
 
 broom::tidy(prop_res_balt) %>% 
   select(estimate, conf.low, conf.high)  
-
 ```
 
 In this chunk, I created a dataframe from the grouping I did earlier and then created a new dataframe with Baltimore as the only city. I applied prop.test to this newly created dataframe (but I didn't do this using pipes). I saved the output of the prop.test results and applied broom::tidy so as to just create a dataframe containing the estimate and the upper and lower confidence intervals.
@@ -183,7 +182,6 @@ In this chunk, I created a dataframe from the grouping I did earlier and then cr
 - Now run prop.test for each of the cities in your dataset, and extract both the proportion of unsolved homicides and the confidence interval for each. Do this within a “tidy” pipeline, making use of purrr::map, purrr::map2, list columns and  unnest as necessary to create a tidy dataframe with estimated proportions and CIs for each city.
 
 ```{r}
-
 prop_new = function(x,n){
   output = prop.test(x,n)
   broom::tidy(output)
@@ -192,8 +190,28 @@ prop_new = function(x,n){
 wp_murders_city %>% 
   mutate(prop = map2(n_unsolved,n_homicide, prop_new) ) %>% 
   unnest() %>% 
-  select(city, estimate,conf.low, conf.high)
+  select(city, estimate, conf.low, conf.high)
 
+```
+
+## Part F
+
+- Create a plot that shows the estimates and CIs for each city – check out geom_errorbar for a way to add error bars based on the upper and lower limits. Organize cities according to the proportion of unsolved homicides.
+
+```{r}
+wp_murders_city %>% 
+  mutate(prop = map2(n_unsolved,n_homicide, prop_new) ) %>% 
+  unnest() %>% 
+  select(city, estimate, conf.low, conf.high) %>% 
+  mutate(city = fct_reorder(city, estimate)) %>% 
+  ggplot() + geom_errorbar(mapping = aes(x = city, ymin = conf.low, ymax = conf.high)) +
+  geom_point(mapping = aes(x = city, y = estimate, color = city )) +
+  labs( title = "Proportion of Unsolved Homicides by City",
+        y = "Unsolved Homicides (%)",
+        x = "City") +
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1)) +
+  scale_x_discrete(expand = expand_scale(add = 0.3))
+  
 ```
 
 
