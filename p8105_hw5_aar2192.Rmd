@@ -153,7 +153,6 @@ As seen by the grouped and arranged dataframe above, the cities with the highest
 - For the city of Baltimore, MD, use the prop.test function to estimate the **proportion of homicides** that are unsolved; save the output of prop.test as an R object, apply the broom::tidy to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
 
 ```{r}
-## currently not sure what prop.test does!!!
 wp_murders_city =
   wp_murders_df %>% 
   group_by(city, disposition) %>% 
